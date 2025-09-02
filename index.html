@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>俄罗斯方块 - Tetris</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>俄罗斯方块</h1>
+        </header>
+
+        <div class="game-main">
+            <!-- 游戏区域 -->
+            <div class="game-area">
+                <canvas id="gameCanvas" width="300" height="600"></canvas>
+                <div class="game-overlay" id="gameOverlay">
+                    <div class="overlay-content">
+                        <h2 id="overlayTitle">开始游戏</h2>
+                        <p id="overlayMessage">按空格键开始游戏</p>
+                        <button id="startButton" class="game-button">开始</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 游戏信息 -->
+                <div class="info-panel">
+                    <div class="info-item">
+                        <label>分数</label>
+                        <span id="score">0</span>
+                    </div>
+                    <div class="info-item">
+                        <label>等级</label>
+                        <span id="level">1</span>
+                    </div>
+                    <div class="info-item">
+                        <label>行数</label>
+                        <span id="lines">0</span>
+                    </div>
+                </div>
+
+                <!-- 下一个方块预览 -->
+                <div class="next-piece">
+                    <h3>下一个</h3>
+                    <canvas id="nextCanvas" width="120" height="120"></canvas>
+                </div>
+
+                <!-- 控制按钮 -->
+                <div class="controls">
+                    <button id="pauseButton" class="control-button">暂停</button>
+                    <button id="restartButton" class="control-button">重新开始</button>
+                </div>
+
+                <!-- 操作说明 -->
+                <div class="instructions">
+                    <h3>操作说明</h3>
+                    <div class="instruction-item">
+                        <span class="key">←→</span>
+                        <span>左右移动</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key">↓</span>
+                        <span>快速下降</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key">↑</span>
+                        <span>旋转</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key">空格</span>
+                        <span>暂停/继续</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="key">C</span>
+                        <span>直接落地</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 移动设备控制区域 -->
+        <div class="mobile-controls" id="mobileControls">
+            <div class="mobile-row">
+                <button class="mobile-button" id="rotateBtn">↻</button>
+                <button class="mobile-button hard-drop-btn" id="hardDropBtn">⬇</button>
+            </div>
+            <div class="mobile-row">
+                <button class="mobile-button" id="leftBtn">←</button>
+                <button class="mobile-button" id="downBtn">↓</button>
+                <button class="mobile-button" id="rightBtn">→</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/tetris.js"></script>
+    <script src="scripts/controls.js"></script>
+    <script src="scripts/game.js"></script>
+</body>
+</html>
