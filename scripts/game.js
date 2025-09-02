@@ -76,7 +76,7 @@ class Game {
     pause() {
         if (this.gameState === 'playing') {
             this.gameState = 'paused';
-            this.showOverlay('游戏暂停', '按空格键或点击继续按钮继续游戏');
+            this.showOverlay('游戏暂停', '按Enter键或点击继续按钮继续游戏');
             document.getElementById('pauseButton').textContent = '继续';
         }
     }

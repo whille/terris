@@ -19,7 +19,7 @@ class Controls {
 
         // 防止方向键滚动页面
         document.addEventListener('keydown', (e) => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter'].includes(e.code)) {
                 e.preventDefault();
             }
         });
@@ -45,33 +45,32 @@ class Controls {
         this.keyPressed[e.code] = false;
     }
 
-    // 处理按键动作
+        // 处理按键动作
     processKeyAction(key) {
-        if (!this.game.isPlaying()) return;
-
         switch (key) {
             case 'ArrowLeft':
-                this.game.movePiece(-1, 0);
+                if (this.game.isPlaying()) this.game.movePiece(-1, 0);
                 break;
             case 'ArrowRight':
-                this.game.movePiece(1, 0);
+                if (this.game.isPlaying()) this.game.movePiece(1, 0);
                 break;
             case 'ArrowDown':
-                this.game.softDrop();
+                if (this.game.isPlaying()) this.game.softDrop();
                 break;
             case 'ArrowUp':
-                this.game.rotatePiece();
+                if (this.game.isPlaying()) this.game.rotatePiece();
                 break;
             case 'Space':
+                // 空格键改为硬降
+                if (this.game.isPlaying()) this.game.hardDrop();
+                break;
+            case 'Enter':
+                // Enter键改为暂停/继续
                 if (this.game.isPaused()) {
                     this.game.resume();
                 } else {
                     this.game.pause();
                 }
-                break;
-            case 'KeyC':
-                // 硬降（可选功能）
-                this.game.hardDrop();
                 break;
         }
     }
