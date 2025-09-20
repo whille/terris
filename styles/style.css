@@ -98,7 +98,8 @@ body {
 }
 
 /* 按钮样式 */
-.game-button, .control-button {
+.game-button,
+.control-button {
     background: linear-gradient(45deg, #ff6b6b, #ee5a24);
     color: white;
     border: none;
@@ -111,12 +112,14 @@ body {
     box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
 }
 
-.game-button:hover, .control-button:hover {
+.game-button:hover,
+.control-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
 }
 
-.game-button:active, .control-button:active {
+.game-button:active,
+.control-button:active {
     transform: translateY(0);
 }
 
@@ -201,6 +204,22 @@ body {
     color: #ffffff;
 }
 
+.instruction-group {
+    margin-bottom: 20px;
+}
+
+.instruction-group:last-child {
+    margin-bottom: 0;
+}
+
+.instruction-group h4 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 5px;
+}
+
 .instruction-item {
     display: flex;
     align-items: center;
@@ -221,6 +240,41 @@ body {
     min-width: 40px;
     text-align: center;
     font-size: 0.8rem;
+}
+
+.gamepad-key {
+    background: linear-gradient(45deg, #4ecdc4, #44a08d);
+    color: white;
+    min-width: 80px;
+    font-size: 0.75rem;
+}
+
+.gamepad-controls {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 15px;
+    margin-top: 15px;
+}
+
+.gamepad-status {
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gamepad-status.connected {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+    color: #a5d6a7;
+}
+
+.gamepad-status.disconnected {
+    background: rgba(244, 67, 54, 0.3);
+    border-color: rgba(244, 67, 54, 0.5);
+    color: #ffcdd2;
 }
 
 /* 移动设备控制 */
@@ -358,6 +412,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

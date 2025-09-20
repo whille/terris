@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>俄罗斯方块 - Tetris</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
+
 <body>
     <div class="game-container">
         <header class="game-header">
@@ -58,25 +60,51 @@
                 <!-- 操作说明 -->
                 <div class="instructions">
                     <h3>操作说明</h3>
-                    <div class="instruction-item">
-                        <span class="key">←→</span>
-                        <span>左右移动</span>
+                    <div class="instruction-group">
+                        <h4>键盘控制</h4>
+                        <div class="instruction-item">
+                            <span class="key">←→</span>
+                            <span>左右移动</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">↓</span>
+                            <span>快速下降</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">↑</span>
+                            <span>旋转</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">空格</span>
+                            <span>直接落地</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">Enter</span>
+                            <span>暂停/继续</span>
+                        </div>
                     </div>
-                    <div class="instruction-item">
-                        <span class="key">↓</span>
-                        <span>快速下降</span>
-                    </div>
-                    <div class="instruction-item">
-                        <span class="key">↑</span>
-                        <span>旋转</span>
-                    </div>
-                    <div class="instruction-item">
-                        <span class="key">空格</span>
-                        <span>直接落地</span>
-                    </div>
-                    <div class="instruction-item">
-                        <span class="key">Enter</span>
-                        <span>暂停/继续</span>
+
+                    <div class="instruction-group gamepad-controls">
+                        <h4>🎮 Xbox手柄控制</h4>
+                        <div class="instruction-item">
+                            <span class="key gamepad-key">方向键/左摇杆</span>
+                            <span>移动</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key gamepad-key">A键/↑</span>
+                            <span>旋转</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key gamepad-key">B键</span>
+                            <span>直接落地</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key gamepad-key">X键</span>
+                            <span>暂停/继续</span>
+                        </div>
+                        <div class="gamepad-status" id="gamepadConnectionStatus">
+                            <span>🔌 请连接Xbox蓝牙手柄</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,4 +128,5 @@
     <script src="scripts/controls.js"></script>
     <script src="scripts/game.js"></script>
 </body>
+
 </html>
