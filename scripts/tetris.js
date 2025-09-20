@@ -33,45 +33,45 @@ class Tetris {
         this.pieces = [
             // I 方块
             [
-                [0,0,0,0],
-                [1,1,1,1],
-                [0,0,0,0],
-                [0,0,0,0]
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
             ],
             // O 方块
             [
-                [2,2],
-                [2,2]
+                [2, 2],
+                [2, 2]
             ],
             // T 方块
             [
-                [0,3,0],
-                [3,3,3],
-                [0,0,0]
+                [0, 3, 0],
+                [3, 3, 3],
+                [0, 0, 0]
             ],
             // S 方块
             [
-                [0,4,4],
-                [4,4,0],
-                [0,0,0]
+                [0, 4, 4],
+                [4, 4, 0],
+                [0, 0, 0]
             ],
             // Z 方块
             [
-                [5,5,0],
-                [0,5,5],
-                [0,0,0]
+                [5, 5, 0],
+                [0, 5, 5],
+                [0, 0, 0]
             ],
             // J 方块
             [
-                [6,0,0],
-                [6,6,6],
-                [0,0,0]
+                [6, 0, 0],
+                [6, 6, 6],
+                [0, 0, 0]
             ],
             // L 方块
             [
-                [0,0,7],
-                [7,7,7],
-                [0,0,0]
+                [0, 0, 7],
+                [7, 7, 7],
+                [0, 0, 0]
             ]
         ];
 
@@ -307,5 +307,59 @@ class Tetris {
         }
 
         return ghostBoard;
+    }
+}
+
+// 玩家专用俄罗斯方块类
+class PlayerTetris extends Tetris {
+    constructor(playerId) {
+        super();
+        this.playerId = playerId;
+        this.isGameOver = false;
+        this.opponent = null; // 对手引用
+    }
+
+    // 设置对手引用
+    setOpponent(opponent) {
+        this.opponent = opponent;
+    }
+
+    // 检查游戏是否结束
+    checkGameOver() {
+        if (this.isGameOver) return true;
+
+        // 检查顶部是否有方块
+        for (let x = 0; x < this.BOARD_WIDTH; x++) {
+            if (this.board[0][x] !== 0 || this.board[1][x] !== 0) {
+                this.isGameOver = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // 重置游戏状态
+    reset() {
+        super.reset();
+        this.isGameOver = false;
+    }
+
+    // 生成新方块时检查游戏结束条件
+    spawnNewPiece() {
+        const success = super.spawnNewPiece();
+        if (!success) {
+            this.isGameOver = true;
+        }
+        return success;
+    }
+
+    // 获取玩家ID
+    getPlayerId() {
+        return this.playerId;
+    }
+
+    // 检查是否输了游戏
+    hasLost() {
+        return this.isGameOver;
     }
 }

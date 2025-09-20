@@ -4,123 +4,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>俄罗斯方块 - Tetris</title>
+    <title>双人俄罗斯方块 - Dual Player Tetris</title>
     <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
     <div class="game-container">
         <header class="game-header">
-            <h1>俄罗斯方块</h1>
+            <h1>双人俄罗斯方块对战</h1>
+            <div class="game-mode-info">
+                <span class="mode-badge">键盘+手柄模式</span>
+            </div>
         </header>
 
         <div class="game-main">
-            <!-- 游戏区域 -->
-            <div class="game-area">
-                <canvas id="gameCanvas" width="300" height="600"></canvas>
-                <div class="game-overlay" id="gameOverlay">
-                    <div class="overlay-content">
-                        <h2 id="overlayTitle">开始游戏</h2>
-                        <p id="overlayMessage">点击开始按钮开始游戏</p>
-                        <button id="startButton" class="game-button">开始</button>
+            <!-- 玩家1区域 -->
+            <div class="player-section player-1">
+                <div class="player-header">
+                    <h2>玩家 1</h2>
+                    <div class="gamepad-status" id="gamepadStatus1">
+                        <span>⌨️ 键盘 WASD+J</span>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    <canvas id="gameCanvas1" width="300" height="600"></canvas>
+                    <div class="game-overlay" id="gameOverlay1">
+                        <div class="overlay-content">
+                            <h2 id="overlayTitle1">准备就绪</h2>
+                            <p id="overlayMessage1">使用键盘或手柄控制，点击开始按钮开始对战！</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="player-info">
+                    <div class="info-panel">
+                        <div class="info-item">
+                            <label>分数</label>
+                            <span id="score1">0</span>
+                        </div>
+                        <div class="info-item">
+                            <label>等级</label>
+                            <span id="level1">1</span>
+                        </div>
+                        <div class="info-item">
+                            <label>行数</label>
+                            <span id="lines1">0</span>
+                        </div>
+                    </div>
+
+                    <div class="next-piece">
+                        <h3>下一个</h3>
+                        <canvas id="nextCanvas1" width="120" height="120"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- 侧边栏 -->
-            <div class="sidebar">
-                <!-- 游戏信息 -->
-                <div class="info-panel">
-                    <div class="info-item">
-                        <label>分数</label>
-                        <span id="score">0</span>
-                    </div>
-                    <div class="info-item">
-                        <label>等级</label>
-                        <span id="level">1</span>
-                    </div>
-                    <div class="info-item">
-                        <label>行数</label>
-                        <span id="lines">0</span>
-                    </div>
-                </div>
-
-                <!-- 下一个方块预览 -->
-                <div class="next-piece">
-                    <h3>下一个</h3>
-                    <canvas id="nextCanvas" width="120" height="120"></canvas>
-                </div>
-
-                <!-- 控制按钮 -->
-                <div class="controls">
+            <!-- 中央控制区域 -->
+            <div class="center-controls">
+                <div class="game-controls">
+                    <button id="startButton" class="game-button">开始对战</button>
                     <button id="pauseButton" class="control-button">暂停</button>
                     <button id="restartButton" class="control-button">重新开始</button>
                 </div>
 
-                <!-- 操作说明 -->
                 <div class="instructions">
-                    <h3>操作说明</h3>
+                    <h3>🎮 控制说明</h3>
+
                     <div class="instruction-group">
-                        <h4>键盘控制</h4>
+                        <h4>玩家1 键盘控制</h4>
                         <div class="instruction-item">
-                            <span class="key">←→</span>
-                            <span>左右移动</span>
-                        </div>
-                        <div class="instruction-item">
-                            <span class="key">↓</span>
-                            <span>快速下降</span>
-                        </div>
-                        <div class="instruction-item">
-                            <span class="key">↑</span>
+                            <span class="key">W</span>
                             <span>旋转</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">A S D</span>
+                            <span>左 下 右</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">J</span>
+                            <span>直接落地</span>
+                        </div>
+                    </div>
+
+                    <div class="instruction-group">
+                        <h4>玩家2 键盘控制</h4>
+                        <div class="instruction-item">
+                            <span class="key">↑ 或 小键盘8</span>
+                            <span>旋转</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key">← ↓ → 或 小键盘4 5 6</span>
+                            <span>左 下 右</span>
                         </div>
                         <div class="instruction-item">
                             <span class="key">空格</span>
                             <span>直接落地</span>
                         </div>
+                    </div>
+
+                    <div class="instruction-group">
+                        <h4>🎮 Xbox手柄控制（可选）</h4>
                         <div class="instruction-item">
-                            <span class="key">Enter</span>
+                            <span class="key gamepad-key">方向键/摇杆</span>
+                            <span>移动方块</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key gamepad-key">B键</span>
+                            <span>旋转</span>
+                        </div>
+                        <div class="instruction-item">
+                            <span class="key gamepad-key">A键</span>
+                            <span>直接落地</span>
+                        </div>
+                    </div>
+
+                    <div class="instruction-group">
+                        <h4>游戏控制</h4>
+                        <div class="instruction-item">
+                            <span class="key">回车</span>
                             <span>暂停/继续</span>
                         </div>
                     </div>
 
-                    <div class="instruction-group gamepad-controls">
-                        <h4>🎮 Xbox手柄控制</h4>
-                        <div class="instruction-item">
-                            <span class="key gamepad-key">方向键/左摇杆</span>
-                            <span>移动</span>
+                    <div class="connection-info">
+                        <p>🎯 支持键盘和手柄混合控制</p>
+                        <p>⚡ 先让对手顶满方块的玩家获胜！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 玩家2区域 -->
+            <div class="player-section player-2">
+                <div class="player-header">
+                    <h2>玩家 2</h2>
+                    <div class="gamepad-status" id="gamepadStatus2">
+                        <span>⌨️ 方向键+空格</span>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    <canvas id="gameCanvas2" width="300" height="600"></canvas>
+                    <div class="game-overlay" id="gameOverlay2">
+                        <div class="overlay-content">
+                            <h2 id="overlayTitle2">准备就绪</h2>
+                            <p id="overlayMessage2">使用键盘或手柄控制，点击开始按钮开始对战！</p>
                         </div>
-                        <div class="instruction-item">
-                            <span class="key gamepad-key">A键/↑</span>
-                            <span>旋转</span>
+                    </div>
+                </div>
+
+                <div class="player-info">
+                    <div class="info-panel">
+                        <div class="info-item">
+                            <label>分数</label>
+                            <span id="score2">0</span>
                         </div>
-                        <div class="instruction-item">
-                            <span class="key gamepad-key">B键</span>
-                            <span>直接落地</span>
+                        <div class="info-item">
+                            <label>等级</label>
+                            <span id="level2">1</span>
                         </div>
-                        <div class="instruction-item">
-                            <span class="key gamepad-key">X键</span>
-                            <span>暂停/继续</span>
+                        <div class="info-item">
+                            <label>行数</label>
+                            <span id="lines2">0</span>
                         </div>
-                        <div class="gamepad-status" id="gamepadConnectionStatus">
-                            <span>🔌 请连接Xbox蓝牙手柄</span>
-                        </div>
+                    </div>
+
+                    <div class="next-piece">
+                        <h3>下一个</h3>
+                        <canvas id="nextCanvas2" width="120" height="120"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 移动设备控制区域 -->
-        <div class="mobile-controls" id="mobileControls">
-            <div class="mobile-row">
-                <button class="mobile-button" id="rotateBtn">↻</button>
-                <button class="mobile-button hard-drop-btn" id="hardDropBtn">⬇</button>
-            </div>
-            <div class="mobile-row">
-                <button class="mobile-button" id="leftBtn">←</button>
-                <button class="mobile-button" id="downBtn">↓</button>
-                <button class="mobile-button" id="rightBtn">→</button>
-            </div>
+        <!-- 移动设备控制区域 (隐藏在双人模式下) -->
+        <div class="mobile-controls" id="mobileControls" style="display: none;">
+            <p>双人对战模式需要使用手柄控制</p>
         </div>
     </div>
 
@@ -128,5 +187,7 @@
     <script src="scripts/controls.js"></script>
     <script src="scripts/game.js"></script>
 </body>
+
+</html>
 
 </html>

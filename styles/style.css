@@ -34,12 +34,94 @@ body {
     margin-bottom: 10px;
 }
 
-/* 主游戏区域 */
+/* 主游戏区域 - 双人布局 */
 .game-main {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     justify-content: center;
     align-items: flex-start;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* 游戏模式信息 */
+.game-mode-info {
+    margin-top: 10px;
+}
+
+.mode-badge {
+    background: linear-gradient(45deg, #4ecdc4, #44a08d);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(68, 160, 141, 0.3);
+}
+
+/* 玩家区域 */
+.player-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 350px;
+}
+
+.player-1 {
+    border: 2px solid #4ecdc4;
+    border-radius: 15px;
+    padding: 20px;
+    background: rgba(78, 205, 196, 0.1);
+}
+
+.player-2 {
+    border: 2px solid #ff6b6b;
+    border-radius: 15px;
+    padding: 20px;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.player-header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.player-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.player-1 .player-header h2 {
+    color: #4ecdc4;
+    text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+}
+
+.player-2 .player-header h2 {
+    color: #ff6b6b;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+/* 中央控制区域 */
+.center-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 280px;
+    align-items: center;
+}
+
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+/* 玩家信息面板 */
+.player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 /* 游戏区域 */
@@ -123,12 +205,46 @@ body {
     transform: translateY(0);
 }
 
-/* 侧边栏 */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    width: 250px;
+/* 连接信息 */
+.connection-info {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.connection-info p {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #cccccc;
+}
+
+/* 手柄状态样式更新 */
+.gamepad-status {
+    margin-top: 5px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.player-1 .gamepad-status.connected {
+    background: rgba(78, 205, 196, 0.3);
+    border-color: rgba(78, 205, 196, 0.5);
+    color: #4ecdc4;
+}
+
+.player-2 .gamepad-status.connected {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: rgba(255, 107, 107, 0.5);
+    color: #ff6b6b;
+}
+
+.gamepad-status.disconnected {
+    background: rgba(150, 150, 150, 0.3);
+    border-color: rgba(150, 150, 150, 0.5);
+    color: #aaaaaa;
 }
 
 /* 信息面板 */
@@ -332,31 +448,49 @@ body {
     box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4) !important;
 }
 
-/* 响应式设计 */
+/* 响应式设计 - 双人模式 */
+@media (max-width: 1200px) {
+    .game-main {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .player-section {
+        min-width: auto;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .center-controls {
+        order: -1;
+        min-width: auto;
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
 @media (max-width: 768px) {
     .game-container {
         padding: 10px;
     }
 
     .game-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
-    .game-main {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
+    .player-section {
+        padding: 15px;
     }
 
-    .sidebar {
-        width: 100%;
-        max-width: 300px;
+    .player-header h2 {
+        font-size: 1.3rem;
     }
 
     .info-panel {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
+        gap: 10px;
     }
 
     .info-item {
@@ -365,18 +499,19 @@ body {
         margin-bottom: 0;
     }
 
-    .mobile-controls {
-        display: block;
+    #gameCanvas1,
+    #gameCanvas2 {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+    }
+
+    .center-controls {
+        padding: 15px;
     }
 
     .instructions {
-        display: none;
-    }
-
-    #gameCanvas {
-        width: 100%;
-        max-width: 300px;
-        height: auto;
+        font-size: 0.9rem;
     }
 }
 

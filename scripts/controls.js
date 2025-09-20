@@ -1,39 +1,47 @@
-// 游戏控制系统
-class Controls {
-    constructor(game) {
-        this.game = game;
+// 双人游戏控制系统 - 支持键盘和手柄混合控制
+class DualPlayerControls {
+    constructor(dualPlayerGame) {
+        this.game = dualPlayerGame;
+
+        // 键盘控制状态
         this.keys = {};
         this.lastKeyTime = {};
-        this.keyRepeatDelay = 150; // 按键重复延迟（毫秒）
-        this.keyRepeatRate = 100;  // 按键重复率（毫秒）- 调慢一些
-        this.keyPressed = {};      // 跟踪按键是否已经处理过首次按下
+        this.keyPressed = {};
+        this.keyRepeatDelay = 150;
+        this.keyRepeatRate = 100;
 
-        // 手柄相关
-        this.gamepads = {};
+        // 手柄控制状态
+        this.gamepads = {}; // 存储已连接的手柄
+        this.playerGamepads = {
+            1: null, // 玩家1的手柄索引
+            2: null  // 玩家2的手柄索引
+        };
         this.gamepadButtons = {};
         this.lastGamepadTime = {};
-        this.gamepadRepeatDelay = 150; // 手柄按键重复延迟（与键盘一致）
-        this.gamepadRepeatRate = 100;  // 手柄按键重复率（与键盘一致）
-        this.gamepadPressed = {};      // 跟踪手柄按键是否已处理
-        this.rotateDebounceDelay = 150; // 旋转操作防抖动延迟（与键盘一致）
-        this.lastRotateTime = 0;       // 上次旋转操作时间
+        this.gamepadPressed = {};
+        this.gamepadRepeatDelay = 150;
+        this.gamepadRepeatRate = 100;
 
-        this.bindEvents();
-        this.bindMobileControls();
+        // 旋转防抖
+        this.rotateDebounceDelay = 150;
+        this.lastRotateTime = { 1: 0, 2: 0 };
+
+        // 绑定事件
+        this.bindKeyboardEvents();
         this.bindGamepadEvents();
-
-        // 检测已连接的手柄
         this.detectConnectedGamepads();
     }
 
     // 绑定键盘事件
-    bindEvents() {
+    bindKeyboardEvents() {
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => this.handleKeyUp(e));
 
         // 防止方向键滚动页面
         document.addEventListener('keydown', (e) => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter'].includes(e.code)) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter',
+                'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyJ',
+                'Numpad8', 'Numpad4', 'Numpad5', 'Numpad6'].includes(e.code)) {
                 e.preventDefault();
             }
         });
@@ -61,149 +69,61 @@ class Controls {
 
     // 处理按键动作
     processKeyAction(key) {
+        const now = Date.now();
+
         switch (key) {
-            case 'ArrowLeft':
-                if (this.game.isPlaying()) this.game.movePiece(-1, 0);
+            // 玩家1控制 (WASD + J)
+            case 'KeyA': // 左移
+                if (this.game.isPlaying()) this.game.getPlayer(1).movePiece(-1, 0);
                 break;
-            case 'ArrowRight':
-                if (this.game.isPlaying()) this.game.movePiece(1, 0);
+            case 'KeyD': // 右移
+                if (this.game.isPlaying()) this.game.getPlayer(1).movePiece(1, 0);
                 break;
-            case 'ArrowDown':
-                if (this.game.isPlaying()) this.game.softDrop();
+            case 'KeyS': // 下降
+                if (this.game.isPlaying()) this.game.getPlayer(1).softDrop();
                 break;
-            case 'ArrowUp':
-                if (this.game.isPlaying()) this.game.rotatePiece();
+            case 'KeyW': // 旋转
+                if (this.game.isPlaying() && (now - this.lastRotateTime[1]) >= this.rotateDebounceDelay) {
+                    this.lastRotateTime[1] = now;
+                    this.game.getPlayer(1).rotatePiece();
+                }
                 break;
-            case 'Space':
-                // 空格键改为硬降
-                if (this.game.isPlaying()) this.game.hardDrop();
+            case 'KeyJ': // 硬降
+                if (this.game.isPlaying()) this.game.getPlayer(1).hardDrop();
                 break;
-            case 'Enter':
-                // Enter键改为暂停/继续
+
+            // 玩家2控制 (方向键 + 小键盘 + 空格)
+            case 'ArrowLeft': // 左移
+            case 'Numpad4': // 左移
+                if (this.game.isPlaying()) this.game.getPlayer(2).movePiece(-1, 0);
+                break;
+            case 'ArrowRight': // 右移
+            case 'Numpad6': // 右移
+                if (this.game.isPlaying()) this.game.getPlayer(2).movePiece(1, 0);
+                break;
+            case 'ArrowDown': // 下降
+            case 'Numpad5': // 下降
+                if (this.game.isPlaying()) this.game.getPlayer(2).softDrop();
+                break;
+            case 'ArrowUp': // 旋转
+            case 'Numpad8': // 旋转
+                if (this.game.isPlaying() && (now - this.lastRotateTime[2]) >= this.rotateDebounceDelay) {
+                    this.lastRotateTime[2] = now;
+                    this.game.getPlayer(2).rotatePiece();
+                }
+                break;
+            case 'Space': // 硬降
+                if (this.game.isPlaying()) this.game.getPlayer(2).hardDrop();
+                break;
+
+            // 游戏控制
+            case 'Enter': // 暂停/继续
                 if (this.game.isPaused()) {
                     this.game.resume();
-                } else {
+                } else if (this.game.isPlaying()) {
                     this.game.pause();
                 }
                 break;
-        }
-    }
-
-    // 更新连续按键和手柄输入
-    update() {
-        const now = Date.now();
-
-        // 键盘连续按键
-        for (let key in this.keys) {
-            if (this.keys[key] && this.keyPressed[key]) {
-                // 检查是否达到重复延迟时间
-                if ((now - this.lastKeyTime[key]) >= this.keyRepeatDelay) {
-                    this.lastKeyTime[key] = now;
-
-                    // 只对移动和下降键启用连续按键
-                    if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowDown') {
-                        this.processKeyAction(key);
-                    }
-                }
-            }
-        }
-
-        // 更新手柄输入
-        this.updateGamepads();
-    }
-
-    // 绑定移动设备控制
-    bindMobileControls() {
-        const leftBtn = document.getElementById('leftBtn');
-        const rightBtn = document.getElementById('rightBtn');
-        const downBtn = document.getElementById('downBtn');
-        const rotateBtn = document.getElementById('rotateBtn');
-        const hardDropBtn = document.getElementById('hardDropBtn');
-
-        if (leftBtn) {
-            this.addTouchEvents(leftBtn, () => this.game.movePiece(-1, 0));
-        }
-
-        if (rightBtn) {
-            this.addTouchEvents(rightBtn, () => this.game.movePiece(1, 0));
-        }
-
-        if (downBtn) {
-            this.addTouchEvents(downBtn, () => this.game.softDrop());
-        }
-
-        if (rotateBtn) {
-            this.addTouchEvents(rotateBtn, () => this.game.rotatePiece(), false);
-        }
-
-        if (hardDropBtn) {
-            this.addTouchEvents(hardDropBtn, () => this.game.hardDrop(), false);
-        }
-    }
-
-    // 添加触摸事件
-    addTouchEvents(element, action, repeatable = true) {
-        let touchInterval;
-        let initialDelay = 200;
-        let repeatRate = 100;
-
-        const startAction = () => {
-            if (!this.game.isPlaying()) return;
-
-            action();
-
-            if (repeatable) {
-                setTimeout(() => {
-                    touchInterval = setInterval(() => {
-                        if (this.game.isPlaying()) {
-                            action();
-                        }
-                    }, repeatRate);
-                }, initialDelay);
-            }
-        };
-
-        const stopAction = () => {
-            if (touchInterval) {
-                clearInterval(touchInterval);
-                touchInterval = null;
-            }
-        };
-
-        // 触摸事件
-        element.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            startAction();
-        });
-
-        element.addEventListener('touchend', stopAction);
-        element.addEventListener('touchcancel', stopAction);
-
-        // 鼠标事件（用于测试）
-        element.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            startAction();
-        });
-
-        element.addEventListener('mouseup', stopAction);
-        element.addEventListener('mouseleave', stopAction);
-    }
-
-    // 检测是否为移动设备
-    isMobileDevice() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-            (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-    }
-
-    // 显示/隐藏移动控制
-    toggleMobileControls() {
-        const mobileControls = document.getElementById('mobileControls');
-        if (mobileControls) {
-            if (this.isMobileDevice()) {
-                mobileControls.style.display = 'block';
-            } else {
-                mobileControls.style.display = 'none';
-            }
         }
     }
 
@@ -212,26 +132,112 @@ class Controls {
         window.addEventListener('gamepadconnected', (e) => {
             console.log('手柄已连接:', e.gamepad.id);
             this.gamepads[e.gamepad.index] = e.gamepad;
+            this.assignGamepadToPlayer(e.gamepad.index);
             this.showGamepadStatus(`✅ 手柄已连接: ${e.gamepad.id}`);
-            this.updateGamepadConnectionStatus(true);
         });
 
         window.addEventListener('gamepaddisconnected', (e) => {
             console.log('手柄已断开:', e.gamepad.id);
-            delete this.gamepads[e.gamepad.index];
-            delete this.gamepadButtons[e.gamepad.index];
-            delete this.lastGamepadTime[e.gamepad.index];
-            delete this.gamepadPressed[e.gamepad.index];
+            this.removeGamepad(e.gamepad.index);
             this.showGamepadStatus('❌ 手柄已断开');
-            this.updateGamepadConnectionStatus(false);
         });
     }
 
-    // 更新手柄状态
-    updateGamepads() {
-        const gamepads = navigator.getGamepads();
+    // 分配手柄给玩家
+    assignGamepadToPlayer(gamepadIndex) {
+        // 优先分配给玩家1，如果玩家1已有手柄，则分配给玩家2
+        if (this.playerGamepads[1] === null) {
+            this.playerGamepads[1] = gamepadIndex;
+            this.updateGamepadStatus(1, true);
+            console.log(`手柄 ${gamepadIndex} 分配给玩家1`);
+        } else if (this.playerGamepads[2] === null) {
+            this.playerGamepads[2] = gamepadIndex;
+            this.updateGamepadStatus(2, true);
+            console.log(`手柄 ${gamepadIndex} 分配给玩家2`);
+        }
+
+        // 检查是否两个手柄都已连接
+        this.checkBothGamepadsConnected();
+    }
+
+    // 移除手柄
+    removeGamepad(gamepadIndex) {
+        delete this.gamepads[gamepadIndex];
+        delete this.gamepadButtons[gamepadIndex];
+        delete this.lastGamepadTime[gamepadIndex];
+        delete this.gamepadPressed[gamepadIndex];
+
+        // 从玩家分配中移除
+        if (this.playerGamepads[1] === gamepadIndex) {
+            this.playerGamepads[1] = null;
+            this.updateGamepadStatus(1, false);
+        } else if (this.playerGamepads[2] === gamepadIndex) {
+            this.playerGamepads[2] = null;
+            this.updateGamepadStatus(2, false);
+        }
+
+        this.checkBothGamepadsConnected();
+    }
+
+    // 更新手柄连接状态显示
+    updateGamepadStatus(playerId, connected) {
+        const statusElement = document.getElementById(`gamepadStatus${playerId}`);
+        if (statusElement) {
+            const span = statusElement.querySelector('span');
+            if (connected) {
+                span.textContent = '🎮 手柄已连接';
+                statusElement.className = 'gamepad-status connected';
+            } else {
+                span.textContent = '🔌 等待手柄连接';
+                statusElement.className = 'gamepad-status disconnected';
+            }
+        }
+    }
+
+    // 检查手柄连接状态（现在不强制要求两个手柄）
+    checkBothGamepadsConnected() {
+        // 游戏现在支持键盘控制，所以总是可以开始
+        this.game.setControlsReady(true);
+
+        const connectedCount = this.getConnectedGamepadsCount();
+        if (connectedCount > 0) {
+            console.log(`${connectedCount}个手柄已连接，支持键盘+手柄混合控制`);
+        }
+    }
+
+    // 更新输入 - 键盘和手柄
+    update() {
         const now = Date.now();
 
+        // 更新键盘连续按键
+        this.updateKeyboardInput(now);
+
+        // 更新手柄输入
+        this.updateGamepadInput(now);
+    }
+
+    // 更新键盘连续按键
+    updateKeyboardInput(now) {
+        for (let key in this.keys) {
+            if (this.keys[key] && this.keyPressed[key]) {
+                // 检查是否达到重复延迟时间
+                if ((now - this.lastKeyTime[key]) >= this.keyRepeatDelay) {
+                    this.lastKeyTime[key] = now;
+
+                    // 只对移动和下降键启用连续按键
+                    if (['KeyA', 'KeyD', 'KeyS', 'ArrowLeft', 'ArrowRight', 'ArrowDown', 'Numpad4', 'Numpad6', 'Numpad5'].includes(key)) {
+                        this.processKeyAction(key);
+                    }
+                }
+            }
+        }
+    }
+
+    // 更新手柄输入
+    updateGamepadInput(now) {
+        const gamepads = navigator.getGamepads();
+
+        // 更新手柄状态
         for (let i = 0; i < gamepads.length; i++) {
             const gamepad = gamepads[i];
             if (!gamepad) continue;
@@ -252,10 +258,20 @@ class Controls {
 
     // 检查手柄按键
     checkGamepadButtons(gamepad, gamepadIndex, now) {
+        // 确定这个手柄属于哪个玩家
+        let playerId = null;
+        if (this.playerGamepads[1] === gamepadIndex) {
+            playerId = 1;
+        } else if (this.playerGamepads[2] === gamepadIndex) {
+            playerId = 2;
+        }
+
+        if (playerId === null) return; // 手柄未分配给任何玩家
+
         // Xbox手柄按键映射
         const buttonMap = {
-            0: 'A',      // A键 - 旋转
-            1: 'B',      // B键 - 硬降
+            0: 'A',      // A键 - 硬降
+            1: 'B',      // B键 - 旋转
             2: 'X',      // X键 - 暂停
             3: 'Y',      // Y键 - 保留
             12: 'Up',    // 方向键上 - 旋转
@@ -276,13 +292,13 @@ class Controls {
                     this.lastGamepadTime[gamepadIndex][buttonName] = now;
 
                     // 对旋转操作进行防抖动处理
-                    if (buttonName === 'Up' || buttonName === 'A') {
-                        if ((now - this.lastRotateTime) >= this.rotateDebounceDelay) {
-                            this.lastRotateTime = now;
-                            this.processGamepadAction(buttonName);
+                    if (buttonName === 'Up' || buttonName === 'B') {
+                        if ((now - this.lastRotateTime[playerId]) >= this.rotateDebounceDelay) {
+                            this.lastRotateTime[playerId] = now;
+                            this.processGamepadAction(playerId, buttonName);
                         }
                     } else {
-                        this.processGamepadAction(buttonName);
+                        this.processGamepadAction(playerId, buttonName);
                     }
                 }
                 // 检查连续按键
@@ -292,7 +308,7 @@ class Controls {
 
                         // 只对移动和下降键启用连续按键
                         if (['Left', 'Right', 'Down'].includes(buttonName)) {
-                            this.processGamepadAction(buttonName);
+                            this.processGamepadAction(playerId, buttonName);
                         }
                     }
                 }
@@ -303,11 +319,11 @@ class Controls {
         }
 
         // 检查摇杆输入
-        this.checkGamepadSticks(gamepad, gamepadIndex, now);
+        this.checkGamepadSticks(gamepad, gamepadIndex, playerId, now);
     }
 
     // 检查摇杆输入
-    checkGamepadSticks(gamepad, gamepadIndex, now) {
+    checkGamepadSticks(gamepad, gamepadIndex, playerId, now) {
         const leftStickX = gamepad.axes[0];
         const leftStickY = gamepad.axes[1];
         const deadzone = 0.3; // 死区
@@ -330,7 +346,7 @@ class Controls {
                 (now - this.lastGamepadTime[gamepadIndex]['StickLeft']) >= this.gamepadRepeatRate) {
                 this.gamepadButtons[gamepadIndex]['StickLeft'] = true;
                 this.lastGamepadTime[gamepadIndex]['StickLeft'] = now;
-                this.processGamepadAction('Left');
+                this.processGamepadAction(playerId, 'Left');
             }
         } else {
             this.gamepadButtons[gamepadIndex]['StickLeft'] = false;
@@ -341,7 +357,7 @@ class Controls {
                 (now - this.lastGamepadTime[gamepadIndex]['StickRight']) >= this.gamepadRepeatRate) {
                 this.gamepadButtons[gamepadIndex]['StickRight'] = true;
                 this.lastGamepadTime[gamepadIndex]['StickRight'] = now;
-                this.processGamepadAction('Right');
+                this.processGamepadAction(playerId, 'Right');
             }
         } else {
             this.gamepadButtons[gamepadIndex]['StickRight'] = false;
@@ -353,7 +369,7 @@ class Controls {
                 (now - this.lastGamepadTime[gamepadIndex]['StickDown']) >= this.gamepadRepeatRate) {
                 this.gamepadButtons[gamepadIndex]['StickDown'] = true;
                 this.lastGamepadTime[gamepadIndex]['StickDown'] = now;
-                this.processGamepadAction('Down');
+                this.processGamepadAction(playerId, 'Down');
             }
         } else {
             this.gamepadButtons[gamepadIndex]['StickDown'] = false;
@@ -366,9 +382,9 @@ class Controls {
                 this.lastGamepadTime[gamepadIndex]['StickUp'] = now;
 
                 // 对摇杆旋转操作进行防抖动处理
-                if ((now - this.lastRotateTime) >= this.rotateDebounceDelay) {
-                    this.lastRotateTime = now;
-                    this.processGamepadAction('Up');
+                if ((now - this.lastRotateTime[playerId]) >= this.rotateDebounceDelay) {
+                    this.lastRotateTime[playerId] = now;
+                    this.processGamepadAction(playerId, 'Up');
                 }
             }
         } else {
@@ -377,23 +393,26 @@ class Controls {
     }
 
     // 处理手柄按键动作
-    processGamepadAction(action) {
+    processGamepadAction(playerId, action) {
+        const player = this.game.getPlayer(playerId);
+        if (!player) return;
+
         switch (action) {
             case 'Left':
-                if (this.game.isPlaying()) this.game.movePiece(-1, 0);
+                if (this.game.isPlaying()) player.movePiece(-1, 0);
                 break;
             case 'Right':
-                if (this.game.isPlaying()) this.game.movePiece(1, 0);
+                if (this.game.isPlaying()) player.movePiece(1, 0);
                 break;
             case 'Down':
-                if (this.game.isPlaying()) this.game.softDrop();
+                if (this.game.isPlaying()) player.softDrop();
                 break;
             case 'Up':
-            case 'A':
-                if (this.game.isPlaying()) this.game.rotatePiece();
-                break;
             case 'B':
-                if (this.game.isPlaying()) this.game.hardDrop();
+                if (this.game.isPlaying()) player.rotatePiece();
+                break;
+            case 'A':
+                if (this.game.isPlaying()) player.hardDrop();
                 break;
             case 'X':
                 if (this.game.isPaused()) {
@@ -435,61 +454,36 @@ class Controls {
         }, 3000);
     }
 
-    // 更新手柄连接状态显示
-    updateGamepadConnectionStatus(connected) {
-        const statusElement = document.getElementById('gamepadConnectionStatus');
-        if (statusElement) {
-            const span = statusElement.querySelector('span');
-            if (connected) {
-                span.textContent = '🎮 Xbox手柄已连接';
-                statusElement.className = 'gamepad-status connected';
-            } else {
-                span.textContent = '🔌 请连接Xbox蓝牙手柄';
-                statusElement.className = 'gamepad-status disconnected';
-            }
-        }
-    }
-
     // 检测已连接的手柄
     detectConnectedGamepads() {
         const gamepads = navigator.getGamepads();
-        let hasConnectedGamepad = false;
 
         for (let i = 0; i < gamepads.length; i++) {
             const gamepad = gamepads[i];
             if (gamepad) {
                 this.gamepads[i] = gamepad;
-                hasConnectedGamepad = true;
+                this.assignGamepadToPlayer(i);
                 console.log('检测到已连接的手柄:', gamepad.id);
             }
         }
 
-        this.updateGamepadConnectionStatus(hasConnectedGamepad);
-
-        if (hasConnectedGamepad) {
-            this.showGamepadStatus('🎮 检测到已连接的Xbox手柄');
+        if (Object.keys(this.gamepads).length > 0) {
+            this.showGamepadStatus('🎮 检测到已连接的手柄');
         }
     }
 
     // 获取连接的手柄数量
-    getConnectedGamepads() {
+    getConnectedGamepadsCount() {
         return Object.keys(this.gamepads).length;
+    }
+
+    // 检查两个手柄是否都已连接
+    areBothGamepadsConnected() {
+        return this.playerGamepads[1] !== null && this.playerGamepads[2] !== null;
     }
 
     // 销毁控制器
     destroy() {
-        document.removeEventListener('keydown', this.handleKeyDown);
-        document.removeEventListener('keyup', this.handleKeyUp);
-
-        // 清理移动控制事件
-        const buttons = ['leftBtn', 'rightBtn', 'downBtn', 'rotateBtn', 'hardDropBtn'];
-        buttons.forEach(btnId => {
-            const btn = document.getElementById(btnId);
-            if (btn) {
-                btn.replaceWith(btn.cloneNode(true)); // 移除所有事件监听器
-            }
-        });
-
         // 清理手柄状态显示
         const statusElement = document.getElementById('gamepadStatus');
         if (statusElement) {
